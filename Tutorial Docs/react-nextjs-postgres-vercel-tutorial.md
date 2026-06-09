@@ -138,6 +138,12 @@ console.log(formatStatus('pending'));  // 'PENDING'
 > **⚠ Watch out**  
 > The one-liner form (no braces, implicit return) is idiomatic JavaScript. You will see it constantly in React code. If it is confusing, mentally expand it to the full form with braces and a `return` statement.
 
+> **🛠 Exercise — Day 1**
+> Open your browser's DevTools console (`F12` → Console tab). You can run JavaScript directly there — no file needed.
+> 1. Declare a `const` for a job title and a `let` for a status. Try reassigning the `const` — read the error message.
+> 2. Write `formatStatus` as a traditional function, then rewrite it as an arrow function. Confirm both produce the same output with `console.log`.
+> 3. Write a one-liner arrow function `getInitials` that takes a full name string (e.g. `'Jane Smith'`) and returns the initials (e.g. `'JS'`). Hint: `.split(' ')`, `.map()`, and `.join('')`.
+
 ---
 
 ## Day 2 — JavaScript Fundamentals II
@@ -211,6 +217,14 @@ async function fetchJobsSafely() {
 
 > **📝 Note: Promises vs async/await**  
 > Promises are the underlying mechanism. `async/await` is syntax sugar on top of them. You will occasionally see `.then()` and `.catch()` in older code — these are the promise chain equivalents of `await` and `catch` blocks. They do the same thing.
+
+> **🛠 Exercise — Day 2**
+> In the browser console or a scratch `.js` file:
+> 1. Create an array of three job objects, each with `id`, `title`, `status`, and `client` properties.
+> 2. Use `.map()` to extract just the `title` from each job into a new array.
+> 3. Use `.filter()` to return only jobs where `status === 'pending'`.
+> 4. Destructure the first job object into individual variables in a single line.
+> 5. Write an `async` function `simulateFetch` that waits 100ms using `await new Promise(resolve => setTimeout(resolve, 100))`, then returns the jobs array. Call it and log the result with `.then(console.log)`.
 
 ---
 
@@ -443,6 +457,13 @@ job-tracker/
 > **💡 The file IS the route**  
 > There is no router configuration file. The folder path is the URL. `app/jobs/page.jsx` serves `/jobs`. `app/jobs/[id]/page.jsx` serves `/jobs/anything`. This is the single most important thing to internalise about Next.js routing.
 
+> **🛠 Exercise — Day 1**
+> No code to write today — orient yourself in the project instead.
+> 1. Open your `job-tracker` folder and locate each file shown in the directory tree above.
+> 2. Without looking: what URL does `app/jobs/[id]/page.jsx` serve? What file path would you create to serve `/api/stats`?
+> 3. Open `app/layout.jsx`. What does it wrap, and why would a change to it affect every page in the app?
+> 4. Run `npm run dev`, open `http://localhost:3000`, then open DevTools → Network tab and reload. This is the request baseline before you add any API routes — keep it in mind for comparison later.
+
 ---
 
 ## Day 2 — File-Based Routing
@@ -556,6 +577,11 @@ export default function StatusToggle({ initialStatus }) {
 > **💡 A practical rule**  
 > Start with every component as a Server Component. Only add `'use client'` when you need interactivity (`onClick`, `onChange`) or hooks (`useState`, `useEffect`). A common pattern is a Server Component page that renders small interactive Client Components inside it.
 
+> **🛠 Exercise — Day 3**
+> 1. Your `JobCard` component uses `onClick` on the toggle button. Does it need `'use client'`? Add the directive to the top of the file and confirm the toggle still works.
+> 2. Create `app/components/StatusBadge.jsx` as a pure Server Component (no `'use client'`). It receives a `status` prop and renders a `<span>` with the status text. Confirm it has no interactivity and therefore needs no directive.
+> 3. In `app/jobs/page.jsx`, temporarily remove `'use client'`. Read the exact error Next.js throws. Put the directive back. This error is one you will encounter regularly — recognising it on sight is useful.
+
 ---
 
 ## Day 4 — API Routes
@@ -605,6 +631,17 @@ export async function POST(request) {
 
 > **📝 Testing your API**  
 > With `npm run dev` running, visit `http://localhost:3000/api/jobs` in your browser — you should see the JSON response. For POST requests, install the **REST Client** extension in VS Code. It lets you write and fire HTTP requests directly from a `.http` file without leaving the editor.
+
+> **🛠 Exercise — Day 4**
+> 1. With `npm run dev` running, visit `http://localhost:3000/api/jobs` and confirm you see the hardcoded JSON array.
+> 2. Create a file `requests.http` in your project root and test a POST request using REST Client:
+>    ```http
+>    POST http://localhost:3000/api/jobs
+>    Content-Type: application/json
+>
+>    { "title": "Replace gutters", "client": "Tom Davies" }
+>    ```
+> 3. After posting, reload the GET URL — the new job should appear. Then restart the dev server (`Ctrl+C`, `npm run dev`) and reload. Notice the new job is gone. This in-memory limitation is exactly what Week 3 fixes.
 
 ---
 
@@ -721,6 +758,14 @@ DELETE FROM jobs WHERE id = 1;
 > **💡 SQL is case-insensitive for keywords**  
 > `SELECT`, `select`, and `Select` all work. Convention is uppercase keywords. Column and table names are case-sensitive in PostgreSQL when quoted, but lowercase by convention.
 
+> **🛠 Exercise — Day 1**
+> Write these queries now so you are ready to run them the moment your Neon database is up tomorrow.
+> 1. Write the `CREATE TABLE` statement from memory, then check your work against the version above.
+> 2. Write a `SELECT` that returns only jobs with `status = 'in_progress'`, ordered by `created_at` descending.
+> 3. Write an `INSERT` that adds a job with title `'Rewire kitchen'` for client `'Sarah Lee'`.
+> 4. Write an `UPDATE` that sets job `id = 3` to `status = 'complete'`.
+> 5. Write a `SELECT` that returns the count of jobs for each status value (hint: `GROUP BY`).
+
 ---
 
 ## Day 2 — Neon Setup and Connection
@@ -761,6 +806,12 @@ export default sql;
 
 > **⚠ Never commit `.env.local`**  
 > Add `.env.local` to your `.gitignore` file (it should be there by default from `create-next-app`). The `DATABASE_URL` contains your database password. If it is ever committed to a public repository, rotate the password immediately in the Neon dashboard.
+
+> **🛠 Exercise — Day 2**
+> 1. In the Neon SQL editor, run the `CREATE TABLE` statement from Day 1.
+> 2. Insert at least three jobs using `INSERT` statements.
+> 3. Run `SELECT * FROM jobs ORDER BY created_at DESC` and confirm your rows appear.
+> 4. Run `git status` in your terminal and confirm `.env.local` does **not** appear in the tracked files list.
 
 ---
 
@@ -889,6 +940,18 @@ export async function PATCH(request, { params }) {
 
 > **📝 `RETURNING *`**  
 > The `RETURNING *` clause tells PostgreSQL to return the affected rows after the `INSERT` or `UPDATE`. Without it, the query returns nothing. This is a PostgreSQL extension — not all databases support it.
+
+> **🛠 Exercise — Day 4**
+> 1. Implement `DELETE /api/jobs/[id]`. It should delete the row and return `204 No Content` on success, or `404` if the id does not exist:
+>    ```js
+>    export async function DELETE(request, { params }) {
+>      const result = await sql`DELETE FROM jobs WHERE id = ${params.id} RETURNING id`;
+>      if (result.length === 0) return Response.json({ error: 'Not found' }, { status: 404 });
+>      return new Response(null, { status: 204 });
+>    }
+>    ```
+> 2. Add a `DELETE` request to your `requests.http` file and test it against a real job id.
+> 3. Verify the row is gone by running `SELECT * FROM jobs` in the Neon SQL editor.
 
 ---
 
@@ -1083,6 +1146,12 @@ export default function JobsPage() {
   );
 }
 ```
+
+> **🛠 Exercise — Day 4**
+> 1. Apply Tailwind classes to your `JobCard` component to match the styled version above — border, padding, shadow, and status badge.
+> 2. Apply the page layout above to `app/jobs/page.jsx` — header, max-width container, and the "New Job" button placement.
+> 3. Open DevTools and switch to a mobile viewport (or narrow your browser window). Change `grid-cols-4` in `StatsBar` to `grid-cols-2 sm:grid-cols-4` so the stats stack neatly on small screens.
+> 4. Push to GitHub — Vercel should deploy the updated styles automatically. Confirm on the live URL.
 
 ---
 
