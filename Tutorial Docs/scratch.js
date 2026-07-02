@@ -1,5 +1,3 @@
-// @ts-check
-
 // node "Tutorial Docs\scratch.js"
 
 let getInitials = (name) => name.split(' ').map(word => word[0]).join();
