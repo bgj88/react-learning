@@ -1,6 +1,5 @@
 // node "Tutorial Docs\scratch.js"
 
-
 const powerJob = {
   id: 1,
   title: 'Wiring',
@@ -21,6 +20,29 @@ const buildingJob = {
 };
 let projectJobs = [powerJob,waterJob,buildingJob];
 
+//-----------------------------------------------------------------------
+
+async function simulateFetch(){
+  try{
+    const response = await new Promise(resolve => setTimeout(resolve, 100));
+    return projectJobs;
+  } catch {
+    console.error('Failed to fetch jobs:',error);
+  }
+}
+
+let fetchJobbies = simulateFetch();
+
+simulateFetch().then((fetchJobbies) => {
+  console.log(fetchJobbies);
+});
+
+
+//-----------------------------------------------------------------------
+
+
+/*
+
 
 function getPendingJobTitles(jobs) {
     const pendingTitles = [];
@@ -38,17 +60,6 @@ let pendingJob = getPendingJobTitles(projectJobs);
 
 
 console.log(pendingJob);
-
-//------------------------------------------------------------------------------
-
-
-/*
-
-
-
-
-
-
 
 
 
