@@ -117,3 +117,93 @@ initials.push(42); // compile error
 | — | TypeScript `.ts` file with `: string[]` (compile-time check) |
 
 ---
+
+## Terminology: passing functions into functions (`.map()` and friends)
+
+Apex doesn't have a clean equivalent for this — it's a different paradigm, not just different naming.
+
+- **`.map()` itself** — a **method** (same word as Apex; a function attached to an object, here the Array prototype), and specifically a **higher-order function**: a function that takes another function as an argument (or returns one).
+- **The function passed into it** (e.g. `word => word[0]`) — a **callback function** (or just **callback**): a function handed to another function, to be *called back* by that function later, rather than called directly by you.
+- **Why this is possible at all** — JavaScript functions are **first-class citizens** (first-class values). A function can be assigned to a variable, stored in an array, passed as an argument, or returned from another function — exactly like a string or number. There's no separate restricted category for "callable things."
+
+```js
+const double = (x) => x * 2;      // a function, stored in a variable like any other value
+
+function applyTwice(fn, value) {  // "fn" is a parameter whose value happens to be a function
+  return fn(fn(value));
+}
+
+console.log(applyTwice(double, 5)); // 20 — double(double(5))
+```
+
+`values.map(someFunction)` isn't "call this function" — it's "here is a function *as data*; call it yourself, once per element, whenever you're ready."
+
+| Concept | Term |
+|---|---|
+| `.map()` | method / higher-order function |
+| `word => word[0]` passed into `.map()` | callback function |
+| Functions behaving like any other value (assignable, passable, returnable) | first-class citizens / first-class functions |
+
+---
+
+## Filter on one attribute, return another — order matters
+
+`.filter()` and `.map()` can each only see what they're given. To filter on one attribute (e.g. `status`) but return a different one (e.g. `title`), **filter first while you still have the full object**, then **map second** to extract just the field you want:
+
+```js
+let pendingJob = projectJobs
+  .filter((job) => job.status.includes('Pending'))  // decide, using the full object
+  .map((job) => job.title);                          // extract, from the filtered results
+```
+
+Written explicitly with a loop and an `if`, for readability:
+
+```js
+function getPendingJobTitles(jobs) {
+  const pendingTitles = [];
+
+  for (const job of jobs) {
+    if (job.status.includes('Pending')) {   // filter step
+      pendingTitles.push(job.title);        // map step
+    }
+  }
+
+  return pendingTitles;
+}
+```
+
+Mental model: filter always goes first, because it needs the whole object to make its decision; once filtered, map is free to shrink each item down to just the one attribute you actually want.
+
+`.includes()` does a substring match (`'Pending Review'` would also match) — use `job.status === 'Pending'` for an exact match instead.
+
+---
+
+## Looping without an index — `for...of` (Apex's colon-loop equivalent)
+
+Apex's `for (String job : jobs)` maps directly onto JavaScript's `for...of` — no index variable, no `.length`, no `jobs[i]`:
+
+```js
+// Apex
+for (Job job : jobs) {
+    if (job.status.contains('Pending')) {
+        pendingTitles.add(job.title);
+    }
+}
+
+// JavaScript
+for (const job of jobs) {
+  if (job.status.includes('Pending')) {
+    pendingTitles.push(job.title);
+  }
+}
+```
+
+**Trap:** `for...in` looks similar but is a *different* loop — it iterates over **keys/indices**, not values. On an array it yields `'0', '1', '2'` (as strings), not the actual elements. For arrays/lists, `for...of` is almost always what you want.
+
+| Apex | JavaScript |
+|------|------------|
+| `for (String job : jobs)` | `for (const job of jobs)` |
+| index-based `for (Integer i = 0; i < jobs.size(); i++)` | `for (let i = 0; i < jobs.length; i++)` (rarely needed unless you need the index) |
+| — (no equivalent commonly used) | `for...in` — iterates keys/indices, not values; avoid for arrays |
+
+---
