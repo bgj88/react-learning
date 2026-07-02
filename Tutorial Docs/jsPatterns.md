@@ -62,3 +62,58 @@ console.log(formatStatus(anyString));  // works on anything
 This matters a lot in React — mutating variables directly instead of using return values is one of the most common sources of bugs.
 
 ---
+
+## Type-checking arrays (Apex `List<String>` equivalent)
+
+Plain JS arrays enforce nothing — `const initials = []; initials.push(42);` is perfectly legal even if every other value is a string. To get Apex-`List<String>`-like defensiveness, options range from manual to full type systems:
+
+**Runtime check (only catches it when the code actually runs):**
+
+```js
+function pushString(array, value) {
+  if (typeof value !== 'string') {
+    throw new TypeError('Expected a string');
+  }
+  array.push(value);
+}
+```
+
+**`// @ts-check` + JSDoc `@type` (catches it in the editor, no build step):**
+
+```js
+// @ts-check
+
+/** @type {string[]} */
+const initials = [];
+
+initials.push('J');   // fine
+initials.push(42);    // VS Code flags this as a type error
+```
+
+**Important:** the `@type` comment is purely *positional* — it applies only to the declaration immediately following it, not to every array in the file. Each array that needs checking needs its own comment directly above it, with nothing in between:
+
+```js
+/** @type {string[]} */
+const initials = [];
+
+/** @type {number[]} */
+const scores = [];
+
+const untyped = []; // no comment above it — no protection
+```
+
+**Full TypeScript** (`.ts` file) gives the same protection without JSDoc, at the cost of needing a compile step:
+
+```ts
+const initials: string[] = [];
+initials.push(42); // compile error
+```
+
+| Apex | JavaScript |
+|------|------------|
+| `List<String>` (type-safe at compile time) | Plain array — no protection by default |
+| — | Runtime `typeof` check before `.push()` |
+| — | `// @ts-check` + `/** @type {string[]} */` (editor-time check on a `.js` file) |
+| — | TypeScript `.ts` file with `: string[]` (compile-time check) |
+
+---

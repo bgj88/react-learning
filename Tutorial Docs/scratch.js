@@ -1,11 +1,13 @@
 // @ts-check
 
-function splitName(name) {
-  return name.split(' ');
-}
+// node "Tutorial Docs\scratch.js"
 
-let jane = 'Jane Smith';
-jane = splitName(jane);
+let getInitials = (name) => name.split(' ').map(word => word[0]).join();
 
-console.log(jane[0]);
-console.log(jane[1]);
+let jane = 'Jane Sarah Eva Smith';
+
+//-----
+
+let initials = getInitials(jane);
+
+console.log(initials);
