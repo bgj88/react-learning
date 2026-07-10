@@ -207,3 +207,45 @@ for (const job of jobs) {
 | — (no equivalent commonly used) | `for...in` — iterates keys/indices, not values; avoid for arrays |
 
 ---
+
+## Where does state live? — per-item vs per-collection
+
+When a list of components is built from `.map()`, it's easy to lose track of which piece of state belongs where. The rule: **state lives at the level of the thing it describes.**
+
+- **Per-item state** — a property of *one* instance (e.g. "is this job pending or complete") → lives inside the item component itself. Each instance manages its own copy independently.
+- **Per-collection state** — a property of the *list as a whole* (e.g. "what jobs exist", "have we finished loading them") → lives inside the component that owns the `.map()`. An individual item component has no way to hold "the whole list" — it only ever knows the one item it was handed via props.
+
+```jsx
+// Per-collection state — lives where the .map() lives
+function JobList() {
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setJobs(hardCodedJobsArray);
+    setLoading(false);
+  }, []);
+
+  if (loading) return <p>Loading jobs...</p>;
+
+  return jobs.map((job) => (
+    <JobCard key={job.id} title={job.title} status={job.status} client={job.client} />
+  ));
+}
+
+// Per-item state — lives inside the item component
+function JobCard({ title, status: initialStatus, client }) {
+  const [status, setStatus] = useState(initialStatus); // this card's own toggle
+  return (/* ... */);
+}
+```
+
+The two never conflict — they're just state describing different-sized things, sitting at different levels of the component tree.
+
+| Apex/LWC | JavaScript / React |
+|---|---|
+| Controller/parent holds the queried `List<Job>` | Parent component holds `jobs` array in `useState` |
+| Each `c-job-item` element manages its own local `@track` property | Each `JobCard` manages its own local `useState` |
+| `@wire`/`connectedCallback` loads the collection once | `useEffect(() => {...}, [])` on the parent loads the collection once |
+
+---
