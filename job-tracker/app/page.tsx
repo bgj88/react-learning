@@ -56,6 +56,7 @@ export default function JobList() {
       />
     );
   }
+  return <div>{jobCards}</div>;
 }
 
 /*
