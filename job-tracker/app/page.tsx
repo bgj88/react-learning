@@ -43,7 +43,7 @@ export default function JobList() {
     loadJobs();
   }, []); // Empty array = run once only. This is important.
 
-  if (loading) return <p>Loading jobs...</p>;
+  if (loading === true) return <p>Loading jobs...</p>;
 
   return (
     <div>
