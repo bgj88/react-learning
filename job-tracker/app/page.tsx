@@ -31,6 +31,7 @@ const buildingJob = {
 const hardCodedJobsArray = [powerJob, waterJob, buildingJob];
 
 export default function JobList() {
+  
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
 
