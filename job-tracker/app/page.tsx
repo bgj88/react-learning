@@ -31,6 +31,34 @@ const buildingJob = {
 const hardCodedJobsArray = [powerJob, waterJob, buildingJob];
 
 export default function JobList() {
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadJobs() {
+      setJobs(hardCodedJobsArray);
+      setLoading(false);
+    }
+    loadJobs();
+  }, []);
+
+  if (loading) return <p>Loading jobs...</p>;
+
+  const jobCards = [];
+  for (const job of jobs) {
+    jobCards.push(
+      <JobCard
+        key={job.id}
+        title={job.title}
+        status={job.status}
+        client={job.client}
+      />
+    );
+  }
+}
+
+/*
+export default function JobList() {
   const [jobs, setJobs] = useState<Job[]>([]); // start with empty array
   const [loading, setLoading] = useState(true);
 
@@ -60,3 +88,4 @@ export default function JobList() {
     </div>
   );
 }
+*/
